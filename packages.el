@@ -24,6 +24,7 @@
     swiper-helm
     outorg
     outshine
+    engine-mode
     ))
 
 
@@ -1355,3 +1356,18 @@ displayed in the mode-line.")
       (defadvice swiper-helm (before add-evil-jump activate)
         (when (configuration-layer/package-declaredp 'evil-jumper)
           (evil-set-jump))))))
+
+(defun luxbock/init-engine-mode ()
+  (use-package engine-mode
+    :defer t
+    :config
+    (progn
+      (defengine github
+        "https://github.com/search?ref=simplesearch&q=%s" "g")
+      (defengine stack-overflow
+        "https://stackoverflow.com/search?q=%s" "s")
+      (defengine twitter
+        "https://twitter.com/search?q=%s" "t")
+      (defengine wikipedia
+        "http://www.wikipedia.org/search-redirect.php?language=en&go=Go&search=%s"
+        "w"))))
