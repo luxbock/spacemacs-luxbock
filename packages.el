@@ -2,7 +2,6 @@
   '(evil
     helm
     org
-    ;; rcirc
     ace-jump-mode
     imenu-anywhere
     clojure-mode-extra-font-locking
@@ -18,7 +17,6 @@
     multiple-cursors
     rainbow-mode
     highlight-indentation
-    ;; auto-yasnippet ;; Something's messed up
     paxedit
     linum-relative
     powerline
