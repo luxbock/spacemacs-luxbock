@@ -26,7 +26,6 @@
     outshine
     ))
 
-; foo
 
 ;; Evil key-binding helpers
 (defun set-in-all-evil-states (key def &optional maps)
