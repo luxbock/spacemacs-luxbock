@@ -26,7 +26,6 @@
 
 (defun luxbock/init-org-projectile ()
   (require 'org-projectile)
-
   (setq org-projectile:projects-file "~/org/projects.org")
   (setq luxbock/org-projectile-todo-template "* TODO %? @%A\n%U\n")
   (setq luxbock/org-projectile-note-template "* %? :NOTE:\n%U\n")
@@ -41,6 +40,9 @@
     "op" 'luxbock/org-projectile-capture-for-current-project))
 
 (defun luxbock/init-evil-cleverparens ()
+  (setq evil-cleverparens-swap-move-by-word-and-symbol t)
   (require 'evil-cleverparens)
-  (add-hook 'emacs-lisp-mode-hook 'evil-cleverparens-mode)
-  (add-hook 'clojure-mode-hook 'evil-cleverparens-mode))
+  (add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode)
+  (add-hook 'cider-mode-hook #'evil-cleverparens-mode)
+  (add-hook 'cider-repl-mode-hook #'evil-cleverparens-mode)
+  (add-hook 'cider-clojure-interaction-mode-hook #'evil-cleverparens-mode))

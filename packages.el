@@ -21,12 +21,11 @@
     linum-relative
     powerline
     helm-swoop
-    swiper-helm
+    ;; swiper-helm
     outorg
     outshine
     engine-mode
     ))
-
 
 ;; Evil key-binding helpers
 (defun set-in-all-evil-states (key def &optional maps)
@@ -137,6 +136,12 @@
 
       (add-hook 'org-capture-mode-hook #'evil-insert-state)
 
+      (defun luxbock/kmacro-start-or-stop ()
+        (interactive)
+        (if defining-kbd-macro
+            (kmacro-end-macro 1)
+          (kmacro-start-macro 1)))
+
       ;; Keys
       (bind-keys :map evil-normal-state-map
                  ;; The opposite of what Vim does, but I like it better
@@ -148,7 +153,8 @@
                  ("gj"    . evil-next-line)
                  ("gk"    . evil-previous-line)
                  ("j"     . evil-next-visual-line)
-                 ("k"     . evil-previous-visual-line))
+                 ("k"     . evil-previous-visual-line)
+                 ("Q"     . luxbock/kmacro-start-or-stop))
 
       (bind-keys :map evil-motion-state-map
                  ("_"           . evil-first-non-blank)
@@ -303,7 +309,8 @@
       (setq helm-split-window-in-side-p nil
             helm-bookmark-show-location t
             helm-buffers-fuzzy-matching t
-            helm-always-two-windows     t)
+            helm-always-two-windows     t
+            helm-split-window-in-side-p t)
 
       (evil-leader/set-key
         dotspacemacs-command-key 'helm-M-x
@@ -557,7 +564,7 @@
               ("B" . org-priority)
               ("C" . org-priority)))
 
-      ;;; Clocking
+;;; Clocking
 
       ;; Resume clocking task when emacs is restarted
       (org-clock-persistence-insinuate)
@@ -605,6 +612,7 @@
                                    '((emacs-lisp . t)
                                      (dot . t)
                                      (ditaa . t)
+                                     (ledger . t)
                                      (python . t)
                                      (clojure . t)
                                      (sh . t)
@@ -742,11 +750,10 @@
                (file "~/org/drill/refile.org") ;; the drill-items via yasnippet-templates
                "* %?"
                :empty-lines 1)
-              ("l" "Save link for reading later"
-               entry
-               (file+headline (format "%s/weblog.org" org-directory)
-                              "Unsorted")
-               "* %:description\n%:link\n%U")
+              ("l" "Ledger Entry" plain (file "~/ledger/2015.ledger")
+               "%(org-read-date) * %?\n"
+               :empty-lines 1)
+
               ;; ("p" "org-protocol"
               ;;  entry (file "~/org/gtd/refile.org")
               ;;  "* TODO Check out: %c :URL:\n%U\n" :immediate-finish t)
@@ -909,7 +916,7 @@
 
                                         ; position the habit graph on the agenda to the right of the default
       (setq org-habit-graph-column 40
-            org-habit-show-habits-only-for-today nil
+            org-habit-show-habits-only-for-today t
             org-habit-following-days 2
             org-habit-preceding-days 42
             org-habit-show-all-today t)
@@ -1347,21 +1354,25 @@ displayed in the mode-line.")
       (when (configuration-layer/package-declaredp 'evil-jumper)
         (evil-set-jump)))))
 
-(defun luxbock/init-swiper-helm ()
-  (use-package swiper-helm
-    :defer t
-    :init
-    (progn
-      (evil-leader/set-key "ss" 'swiper-helm)
-      (defadvice swiper-helm (before add-evil-jump activate)
-        (when (configuration-layer/package-declaredp 'evil-jumper)
-          (evil-set-jump))))))
+;; (defun luxbock/init-swiper-helm ()
+;;   (use-package swiper-helm
+;;     :defer t
+;;     :init
+;;     (progn
+;;       (evil-leader/set-key "ss" 'swiper-helm)
+;;       (defadvice swiper-helm (before add-evil-jump activate)
+;;         (when (configuration-layer/package-declaredp 'evil-jumper)
+;;           (evil-set-jump))))))
 
 (defun luxbock/init-engine-mode ()
+  "From: https://github.com/hrs/engine-mode"
   (use-package engine-mode
     :defer t
     :config
     (progn
+      (defengine google
+        "http://www.google.com/search?ie=utf-8&oe=utf-8&q=%s"
+        "SPC")
       (defengine github
         "https://github.com/search?ref=simplesearch&q=%s" "g")
       (defengine stack-overflow

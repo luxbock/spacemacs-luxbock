@@ -448,7 +448,7 @@
         (set-marker (pop bh/project-list) nil))
       (re-search-forward "Tasks to Refile")
       (forward-visible-line 1))
-    
+ 
                                         ; Build a new project marker list
     (unless bh/project-list
       (while (< (point) (point-max))
@@ -461,7 +461,7 @@
         (when (< (point) (point-max))
           (add-to-list 'bh/project-list (copy-marker (org-get-at-bol 'org-hd-marker)) 'append))
         (forward-visible-line 1)))
-    
+
                                         ; Pop off the first marker on the list and display
     (setq current-project (pop bh/project-list))
     (when current-project
