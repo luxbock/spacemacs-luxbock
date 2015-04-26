@@ -27,7 +27,6 @@
     engine-mode
     ))
 
-
 ;; Evil key-binding helpers
 (defun set-in-all-evil-states (key def &optional maps)
   (unless maps
@@ -740,11 +739,11 @@
                "\n* %? :IDEA:\n%U\n")
               ("j" "Journal"
                entry
-               (file+datetree "~/org/journal.org")
+               (file+datetree "~/org/journal.org.gpg")
                "* %? :JOURNAL:\n")
               ("s" "Daily Synopsis"
                entry
-               (file+datetree "~/org/journal.org")
+               (file+datetree "~/org/journal.org.gpg")
                "* Synopsis :drill:\n%?\n** Date:\n%<%e %B %Y, %A>")
               ("d" "Drill"
                entry ;; use plain items so that I can write
