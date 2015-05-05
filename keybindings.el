@@ -1,4 +1,3 @@
-
 ;;; Leader
 
 (spacemacs/declare-prefix "y" "yasnippet")
@@ -44,7 +43,10 @@
   "ty" 'yas-minor-mode
 
   "om" 'op/copy-last-message
+  "ow" 'whitespace-cleanup
 
+  "oa"  'luxbock/switch-to-default-agenda-view
+  "ot"  'org-capture
   "oci" 'bh/punch-in
   "ocs" 'bh/punch-out
   "oco" 'org-clock-out
@@ -66,4 +68,3 @@
 ;; (define-key company-active-map (kbd "C-M-/") 'company-filter-candidates)
 ;; (define-key company-active-map (kbd "C-d") 'company-show-doc-buffer)
 ;; (define-key company-active-map (kbd "C-w") 'subword-backward-kill)
-

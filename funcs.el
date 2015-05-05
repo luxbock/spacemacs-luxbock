@@ -17,7 +17,7 @@
   Intelligently means: region, org-src-block, org-subtree, or defun,
   whichever applies first.
   Narrowing to org-src-block actually calls `org-edit-src-code'.
-  
+
   With prefix P, don't widen, just narrow even if buffer is already
   narrowed."
   (interactive "P")
@@ -178,7 +178,7 @@
             (save-excursion
               (forward-line 1)
               (while (and (not has-next)
-                          
+
                           (< (point) subtree-end)
                           (re-search-forward "^\\*+ NEXT " subtree-end t))
                 (unless (member "WAITING" (org-get-tags-at))
@@ -448,7 +448,7 @@
         (set-marker (pop bh/project-list) nil))
       (re-search-forward "Tasks to Refile")
       (forward-visible-line 1))
- 
+
                                         ; Build a new project marker list
     (unless bh/project-list
       (while (< (point) (point-max))
@@ -620,7 +620,7 @@ as the default task."
 ;; Removes redundant tags
 (defun org-remove-redundant-tags ()
   "Remove redundant tags of headlines in current buffer.
-  
+
     A tag is considered redundant if it is local to a headline and
     inherited by a parent headline."
   (interactive)
@@ -666,7 +666,7 @@ as the default task."
   "Copies the last line of *Messages* to kill-ring. Will strip
   the [times N] string at the end of the line for commands that
   were repeated.
-  
+
   With prefix P, insert the last message to the current buffer."
   (interactive "P")
   (let ((cur-buf (current-buffer)))
@@ -709,3 +709,19 @@ as the default task."
 (defun swap-with-down () (interactive) (swap-window 'down))
 (defun swap-with-up () (interactive) (swap-window 'up))
 (defun swap-with-right () (interactive) (swap-window 'right))
+
+(defun luxbock/set-exec-path-from-shell-PATH ()
+  (let ((path-from-shell (replace-regexp-in-string
+                          "[ \t\n]*$"
+                          ""
+                          (shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
+    (setenv "PATH" path-from-shell)
+    (setq eshell-path-env path-from-shell) ; for eshell users
+    (setq exec-path (split-string path-from-shell path-separator))))
+
+(defun luxbock/switch-to-default-agenda-view (arg)
+  (interactive "p")
+  (let ((b (get-buffer "*Org Agenda( )*")))
+    (if b (switch-to-buffer b)
+      (execute-kbd-macro (kbd "C-c a SPC"))
+      (switch-to-buffer b))))

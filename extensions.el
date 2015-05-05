@@ -1,7 +1,7 @@
 (defvar luxbock-post-extensions
   '(
     leuven-dark-theme
-    leuven-theme
+    material-theme
     evil-paxedit
     align-let
     org-projectile
@@ -9,16 +9,10 @@
     ))
 
 (defun luxbock/init-leuven-dark-theme ()
-  (add-to-list 'custom-theme-load-path "~/.emacs.d/private/luxbock/extensions/leuven-dark-theme")
-  )
-
-(defun luxbock/init-leuven-theme ()
-  (add-to-list 'custom-theme-load-path "~/.emacs.d/private/luxbock/extensions/leuven-theme")
-  )
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/private/luxbock/extensions/leuven-dark-theme"))
 
 (defun luxbock/init-evil-paxedit-mode ()
-  (require 'evil-paxedit)
-  )
+  (require 'evil-paxedit))
 
 (defun luxbock/init-align-let ()
   (require 'align-let)
@@ -46,3 +40,7 @@
   (add-hook 'cider-mode-hook #'evil-cleverparens-mode)
   (add-hook 'cider-repl-mode-hook #'evil-cleverparens-mode)
   (add-hook 'cider-clojure-interaction-mode-hook #'evil-cleverparens-mode))
+
+(defun luxbock/init-material-theme ()
+  (add-to-list 'custom-theme-load-path "~/spacemacs-luxbock/extensions/emacs-material-theme")
+  )

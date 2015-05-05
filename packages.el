@@ -1,14 +1,12 @@
 (defvar luxbock-packages
-  '(evil
-    helm
-    org
+  '(org
+    ox-gfm
     ace-jump-mode
     imenu-anywhere
     clojure-mode-extra-font-locking
     visual-regexp-steroids
     dired-subtree
     dired-filter
-    yasnippet
     yagist
     git-auto-commit-mode
     drag-stuff
@@ -16,416 +14,10 @@
     htmlize
     multiple-cursors
     rainbow-mode
-    highlight-indentation
     paxedit
-    linum-relative
-    powerline
-    helm-swoop
-    ;; swiper-helm
-    outorg
-    outshine
     engine-mode
+    srefactor
     ))
-
-;; Evil key-binding helpers
-(defun set-in-all-evil-states (key def &optional maps)
-  (unless maps
-    (setq maps (list evil-normal-state-map
-                     evil-visual-state-map
-                     evilinsert-state-map
-                     evil-emacs-state-map
-                     evil-motion-state-map)))
-  (while maps
-    (define-key (pop maps) key def)))
-
-
-(defun set-in-all-evil-states-but-insert (key def)
-  (set-in-all-evil-states key def
-                          (list evil-normal-state-map
-                                evil-visual-state-map
-                                evil-motion-state-map)))
-
-(defun luxbock/init-evil ()
-  (use-package evil
-    :init
-    (progn
-
-      (defun spacemacs/state-color-face (state)
-        "Return the symbol of the face for the given STATE."
-        (intern (format "spacemacs-%s-face" (symbol-name state))))
-
-      (defun spacemacs/defface-state-color (state color)
-        "Define a face for the given STATE and background COLOR."
-        (eval `(defface ,(spacemacs/state-color-face state) '((t ()))
-                 ,(format "%s state face." (symbol-name state))
-                 :group 'spacemacs))
-        (set-face-attribute (spacemacs/state-color-face state) nil
-                            :background color
-                            :foreground (face-background 'mode-line)
-                            :box (face-attribute 'mode-line :box)
-                            :inherit 'mode-line))
-
-      (defun spacemacs/state-color (state)
-        "Return the color string associated to STATE."
-        (face-background (spacemacs/state-color-face state)))
-
-      (defun spacemacs/current-state-color ()
-        "Return the color string associated to the current state."
-        (face-background (spacemacs/state-color-face evil-state)))
-
-      (defun spacemacs/state-face (state)
-        "Return the face associated to the STATE."
-        (spacemacs/state-color-face state))
-
-      (defun spacemacs/current-state-face ()
-        "Return the face associated to the current state."
-        (let ((state (if (eq evil-state 'operator)
-                         evil-previous-state
-                       evil-state)))
-          (spacemacs/state-color-face state)))
-
-      (defun spacemacs/set-state-faces ()
-        "Define or set the state faces."
-        (mapcar (lambda (x) (spacemacs/defface-state-color (car x) (cdr x)))
-                '((normal . "DarkGoldenrod2")
-                  (insert . "chartreuse3")
-                  (emacs  . "SkyBlue2")
-                  (visual . "gray")
-                  (motion . "plum3")
-                  (lisp   . "HotPink1"))))
-      (spacemacs/set-state-faces)
-
-      (defun set-default-evil-emacs-state-cursor ()
-        (setq evil-emacs-state-cursor `(,(spacemacs/state-color 'emacs) box)))
-
-      (defun set-default-evil-normal-state-cursor ()
-        (setq evil-normal-state-cursor `(,(spacemacs/state-color 'normal) box)))
-
-      (defun set-default-evil-insert-state-cursor ()
-        (setq evil-insert-state-cursor `(,(spacemacs/state-color 'insert) (bar . 2))))
-
-      (defun set-default-evil-visual-state-cursor ()
-        (setq evil-visual-state-cursor `(,(spacemacs/state-color 'visual) (hbar . 2))))
-
-      (defun set-default-evil-motion-state-cursor ()
-        (setq evil-motion-state-cursor `(,(spacemacs/state-color 'motion) box)))
-
-      (defun set-default-evil-lisp-state-cursor ()
-        (setq evil-lisp-state-cursor `(,(spacemacs/state-color 'lisp) box)))
-
-      (defun evil-insert-state-cursor-hide ()
-        (setq evil-insert-state-cursor `(,(spacemacs/state-color 'insert) (hbar . 0))))
-
-      (set-default-evil-emacs-state-cursor)
-      (set-default-evil-normal-state-cursor)
-      (set-default-evil-insert-state-cursor)
-      (set-default-evil-visual-state-cursor)
-      (set-default-evil-motion-state-cursor)
-      (set-default-evil-lisp-state-cursor)
-      (evil-mode 1))
-
-    :config
-    (progn
-      (setq evil-cross-lines nil
-            evil-want-visual-char-semi-exclusive t
-            evil-want-fine-undo nil
-            evil-move-cursor-back nil
-            evil-insert-state-cursor nil)
-
-      (setq-default evil-symbol-word-search t)
-
-      (add-hook 'org-capture-mode-hook #'evil-insert-state)
-
-      (defun luxbock/kmacro-start-or-stop ()
-        (interactive)
-        (if defining-kbd-macro
-            (kmacro-end-macro 1)
-          (kmacro-start-macro 1)))
-
-      ;; Keys
-      (bind-keys :map evil-normal-state-map
-                 ;; The opposite of what Vim does, but I like it better
-                 ("'"     . evil-goto-mark)
-                 ("`"     . evil-goto-mark-line)
-                 ("gt"    . goto-char)
-                 ("gl"    . goto-line)
-                 ("\\"    . evil-repeat-find-char-reverse)
-                 ("gj"    . evil-next-line)
-                 ("gk"    . evil-previous-line)
-                 ("j"     . evil-next-visual-line)
-                 ("k"     . evil-previous-visual-line)
-                 ("Q"     . luxbock/kmacro-start-or-stop))
-
-      (bind-keys :map evil-motion-state-map
-                 ("_"           . evil-first-non-blank)
-                 ("j"           . evil-next-visual-line)
-                 ("k"           . evil-previous-visual-line))
-
-      (bind-keys :map evil-insert-state-map
-                 ("C-k"        . nil)
-                 ("C-y"        . nil)
-                 ("C-n"        . nil)
-                 ("C-d"        . nil)
-                 ("C-w"        . backward-kill-word)
-                 ("C-x C-n"    . evil-complete-next-line)
-                 ("C-x C-p"    . evil-complete-previous-line)
-                 ("C-SPC"      . company-complete-common))
-
-      ;; Windows
-      (bind-keys :map evil-emacs-state-map ("C-w" . evil-window-map))
-      (bind-keys :prefix "C-w"
-           :prefix-map evil-window-map
-           ("C-w"        . helm-mini)
-           ("0"          . delete-window)
-           ("1"          . delete-other-windows)
-           ("2"          . split-window-below)
-           ("3"          . split-window-right)
-           ("h"          . evil-window-left)
-           ("H"          . scroll-left)
-           ("L"          . scroll-right)
-           ("l"          . evil-window-right)
-           ("k"          . evil-window-up)
-           ("j"          . evil-window-down)
-           ("u"          . winner-undo)
-           ("r"          . winner-redo)
-           ("n"          . evil-window-next)
-           ("m"          . evil-window-prev)
-           ("w"          . op/toggle-previous-buffer)
-           ("N"          . evil-window-prev)
-           ("J"          . scroll-other-window)
-           ("K"          . scroll-other-window-down)
-           ("c"          . evil-window-new)
-           ("d"          . toggle-current-window-dedication)
-           ("b"          . switch-to-buffer)
-           ("B"          . switch-to-buffer-other-window)
-           ("o"          . other-window)
-           ("D"          . kill-buffer-and-window)
-           ("RET"        . enlarge-window)
-           ("C-<return>" . enlarge-window)
-           ;; Swapping
-           ("M-h"        . swap-with-left)
-           ("M-j"        . swap-with-down)
-           ("M-k"        . swap-with-up)
-           ("M-l"        . swap-with-right)
-           ("SPC"        . swap-window)
-           ;; Splitting
-           ("|"          . evil-window-vsplit)
-           ("\\"         . evil-window-split)
-           ("s"          . cofi/smart-split)
-           ;; Swapping
-           ("M-h"        . swap-with-left)
-           ("M-l"        . swap-with-right)
-           ("M-j"        . swap-with-down)
-           ("M-k"        . swap-with-up)
-           ;; Adjusting height
-           ("="          . balance-windows)
-           ("+"          . evil-window-increase-height)
-           ("-"          . evil-window-decrease-height)
-           ("a"          . evil-window-decrease-height)
-           ("q"          . evil-window-increase-height)
-           ("C-q"        . evil-window-increase-height)
-           ("C-a"        . evil-window-decrease-height)
-           ("e"          . op/window-shortcut-map)
-           ("C-e"        . op/window-shortcut-map))
-
-      ;; Scrolling
-
-      (defun scroll-up-by-ten ()
-        (interactive)
-        (evil-scroll-up 10))
-
-      (defun scroll-down-by-ten ()
-        (interactive)
-        (evil-scroll-down 10))
-
-      (set-in-all-evil-states-but-insert (kbd "C-u") 'scroll-up-by-ten)
-      (set-in-all-evil-states-but-insert (kbd "C-d") 'scroll-down-by-ten)
-      (define-key evil-insert-state-map  (kbd "C-v") 'scroll-down-by-ten)
-      (define-key evil-insert-state-map  (kbd "M-v") 'scroll-up-by-ten)
-      (define-key evil-emacs-state-map   (kbd "C-v") 'scroll-down-by-ten)
-      (define-key evil-emacs-state-map   (kbd "M-v") 'scroll-up-by-ten)
-
-      (defadvice evil-goto-mark (before goto-mark-evil-jump activate)
-        (evil-set-jump))
-
-      (defadvice evil-goto-mark-line (before goto-mark-line-evil-jump activate)
-        (evil-set-jump))
-
-      ;; evil ex-command key
-      (define-key evil-motion-state-map (kbd dotspacemacs-command-key) 'evil-ex)
-      ;; Make evil-mode up/down operate in screen lines instead of logical lines
-      (define-key evil-normal-state-map "j" 'evil-next-visual-line)
-      (define-key evil-normal-state-map "k" 'evil-previous-visual-line)
-      ;; Make the current definition and/or comment visible.
-      (define-key evil-normal-state-map "zf" 'reposition-window)
-      ;; quick navigation
-      (define-key evil-normal-state-map (kbd "L")
-        (lambda () (interactive)
-          (evil-window-bottom)
-          (let ((recenter-redisplay nil))
-            (recenter nil))))
-      (define-key evil-normal-state-map (kbd "H")
-        (lambda () (interactive)
-          (evil-window-top)
-          (let ((recenter-redisplay nil))
-            (recenter nil))))
-      (evil-leader/set-key "re" 'evil-show-registers)
-      ;; define text objects
-      (defmacro spacemacs|define-and-bind-text-object (key name start-regex end-regex)
-        (let ((inner-name (make-symbol (concat "evil-inner-" name)))
-              (outer-name (make-symbol (concat "evil-outer-" name))))
-          `(progn
-             (evil-define-text-object ,inner-name (count &optional beg end type)
-               (evil-select-paren ,start-regex ,end-regex beg end type count nil))
-             (evil-define-text-object ,outer-name (count &optional beg end type)
-               (evil-select-paren ,start-regex ,end-regex beg end type count t))
-             (define-key evil-inner-text-objects-map ,key (quote ,inner-name))
-             (define-key evil-outer-text-objects-map ,key (quote ,outer-name)))))
-      ;; between dollars sign:
-      (spacemacs|define-and-bind-text-object "$" "dollar" "\\$" "\\$")
-      ;; between pipe characters:
-      (spacemacs|define-and-bind-text-object "|" "bar" "|" "|")
-      ;; between percent signs:
-      (spacemacs|define-and-bind-text-object "%" "percent" "%" "%")
-
-      ;; add star block
-      (spacemacs|define-and-bind-text-object "*" "star-block" "/*" "*/")
-      ;; add slash block
-      (spacemacs|define-and-bind-text-object "/" "slash-block" "//" "//")
-
-      ;; support smart 1parens-strict-mode
-      (if (ht-contains? configuration-layer-all-packages 'smartparens)
-          (defadvice evil-delete-backward-char-and-join
-              (around spacemacs/evil-delete-backward-char-and-join activate)
-            (if smartparens-strict-mode
-                (call-interactively 'sp-backward-delete-char)
-              ad-do-it))))))
-
-(defun luxbock/init-helm ()
-  (use-package helm
-    :defer t
-    :init
-    (progn
-      (setq helm-split-window-in-side-p nil
-            helm-bookmark-show-location t
-            helm-buffers-fuzzy-matching t
-            helm-always-two-windows     t
-            helm-split-window-in-side-p t)
-
-      (evil-leader/set-key
-        dotspacemacs-command-key 'helm-M-x
-        "bs"  'helm-mini
-        "ol"  'helm-colors
-        "sl"  'helm-semantic-or-imenu
-        "hb"  'helm-bookmarks
-        "ho"  'helm-occur
-        "hl"  'helm-resume
-        "ry"  'helm-show-kill-ring
-        "rr"  'helm-register
-        "rm"  'helm-all-mark-rings
-        "fr"  'helm-recentf
-        "fl"  'helm-locate
-        "<f1>" 'helm-apropos)
-
-      (when dotspacemacs-helm-micro-state
-        (defcustom spacemacs-helm-navigation-micro-state-color
-          (face-attribute 'error :foreground)
-          "Background color of helm header when helm micro-state is activated."
-          :type 'color
-          :group 'spacemacs)))
-
-    :config
-    (progn
-      (helm-mode +1)
-
-      ;; alter helm-bookmark key bindings to be simpler
-      (defun simpler-helm-bookmark-keybindings ()
-        (define-key helm-bookmark-map (kbd "C-d") 'helm-bookmark-run-delete)
-        (define-key helm-bookmark-map (kbd "C-e") 'helm-bookmark-run-edit)
-        (define-key helm-bookmark-map (kbd "C-f") 'helm-bookmark-toggle-filename)
-        (define-key helm-bookmark-map (kbd "C-o") 'helm-bookmark-run-jump-other-window)
-        (define-key helm-bookmark-map (kbd "C-/") 'helm-bookmark-help))
-
-      (add-hook 'helm-mode-hook 'simpler-helm-bookmark-keybindings)
-
-      ;; helm navigation on hjkl
-      (define-key helm-map (kbd "C-j") 'helm-next-line)
-      (define-key helm-map (kbd "C-k") 'helm-previous-line)
-      (define-key helm-map (kbd "C-h") 'helm-next-source)
-      (define-key helm-map (kbd "C-l") 'helm-previous-source)
-      (define-key helm-map (kbd "C-w") 'subword-backward-kill)
-
-      ;; eshell
-      (defun spacemacs/helm-eshell-history ()
-        "Correctly revert to insert state after selection."
-        (interactive)
-        (helm-eshell-history)
-        (evil-insert-state))
-
-      (defun spacemacs/helm-shell-history ()
-        "Correctly revert to insert state after selection."
-        (interactive)
-        (helm-comint-input-ring)
-        (evil-insert-state))
-
-      (defun spacemacs/init-helm-eshell ()
-        "Initialize helm-eshell."
-        ;; this is buggy for now
-        ;; (define-key eshell-mode-map (kbd "<tab>") 'helm-esh-pcomplete)
-        (evil-leader/set-key-for-mode 'eshell-mode "mH" 'spacemacs/helm-eshell-history))
-
-      (add-hook 'eshell-mode-hook 'spacemacs/init-helm-eshell)
-      (evil-leader/set-key-for-mode 'shell-mode "mH" 'spacemacs/helm-shell-history)
-
-      (when dotspacemacs-helm-micro-state
-        (defun spacemacs//on-enter-helm-navigation-micro-state ()
-          "Initialization of helm micro-state."
-          (set-face-attribute
-           'helm-header nil
-           :background spacemacs-helm-navigation-micro-state-color)
-          ;; bind actions on numbers starting from 1 which executes action 0
-          (dotimes (n 10)
-            (define-key helm-map (number-to-string n)
-              `(lambda () (interactive) (helm-select-nth-action
-                                         ,(% (+ n 9) 10))))))
-
-        (defun spacemacs//on-exit-helm-navigation-micro-state ()
-          "Action to perform when exiting helm micor-state."
-          ;; restore helm key map
-          (dotimes (n 10) (define-key helm-map (number-to-string n) nil))
-          ;; restore faces
-          (set-face-attribute
-           'helm-header nil
-           :background (face-attribute 'header-line :background)))
-
-        (spacemacs|define-micro-state helm-navigation
-          :on-enter (spacemacs//on-enter-helm-navigation-micro-state)
-          :on-exit  (spacemacs//on-exit-helm-navigation-micro-state)
-          :bindings
-          ("C-c" nil :exit t)
-          ("?" helm-help)
-          ("a" helm-select-action)
-          ("g" helm-beginning-of-buffer)
-          ("G" helm-end-of-buffer)
-          ("h" helm-previous-source)
-          ("j" helm-next-line)
-          ("k" helm-previous-line)
-          ("l" helm-next-source)
-          ("r" helm-select-action :exit t)
-          ("t" helm-toggle-visible-mark)
-          ("T" helm-toggle-all-marks)
-          ("<tab>" helm-execute-persistent-action)
-          ("v" helm-execute-persistent-action)))
-
-      (global-set-key (kbd "C-x C-f") 'helm-find-files)
-      (global-set-key (kbd "M-x") 'helm-M-x)
-
-      (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
-      (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
-      (define-key helm-map (kbd "C-SPC") 'helm-execute-persistent-action)
-
-      (eval-after-load "helm-mode" ; required
-        '(spacemacs|hide-lighter helm-mode)))))
 
 ;; (defun luxbock/init-org-projectile ()
 ;;   (use-package org-projectile
@@ -450,6 +42,7 @@
     :init
     (progn
       (setq org-log-done t)
+      (setq org-agenda-window-setup 'current-window)
       (add-hook 'org-mode-hook 'org-indent-mode)
       (evil-leader/set-key-for-mode 'org-mode
         "ot" 'org-capture
@@ -468,18 +61,15 @@
         "ms" 'org-schedule
         "mt" 'org-todo)
 
-      (eval-after-load 'evil-org
-        ;; move the leader bindings to `m` prefix to be consistent with
-        ;; the rest of spacemacs bindings
-        '(evil-leader/set-key-for-mode 'org-mode
-           "ma" 'org-agenda
-           "mA" 'org-archive-subtree
-           "mC" 'evil-org-recompute-clocks
-           "ml" 'evil-org-open-links
-           "mt" 'org-show-todo-tree)))
+      (eval-after-load "org-agenda"
+        '(progn
+           (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
+           (define-key org-agenda-mode-map "k" 'org-agenda-previous-line)
+           (define-key org-agenda-mode-map
+             (kbd "SPC") evil-leader--default-map))))
     :config
     (progn
-      (require 'org-install)
+      (require 'org)
       (require 'org-habit)
       (require 'org-protocol)
       (require 'org-id)
@@ -926,9 +516,7 @@
 
       ;; Archiving
       (setq org-archive-mark-done nil)
-      (setq org-archive-location "%s_archive::* Archived Tasks")
-
-      )))
+      (setq org-archive-location "%s_archive::* Archived Tasks"))))
 
 (defun spacemacs/init-ace-jump-mode ()
   (use-package ace-jump-mode
@@ -944,41 +532,6 @@
       (setq ace-jump-mode-scope 'window)
       (evil-leader/set-key "`" 'ace-jump-mode-pop-mark))))
 
-;; (defun luxbock/init-rcirc ()
-;;   (use-package rcirc
-;;     :commands irc
-;;     :init
-;;     (progn
-;;       (add-to-hook 'rcirc-mode-hook '(rcirc-track-minor-mode
-;;                                       rcirc-omit-mode
-;;                                       ;; rcirc-reconnect-mode
-;;                                       flyspell-mode))
-;;       (setq evil-normal-state-modes
-;;             (cons 'rcirc-mode evil-normal-state-modes)))
-;;     :config
-;;     (progn
-;;       (setq rcirc-fill-column 80
-;;             rcirc-buffer-maximum-lines 2048
-;;             rcirc-omit-responses '("JOIN" "PART" "QUIT" "NICK" "AWAY")
-;;             rcirc-omit-threshold 20
-;;             rcirc-default-nick "luxbock"
-;;             rcirc-log-flag t
-;;             rcirc-log-directory "~/.emacs.d/private/rcirc-log/"
-;;             rcirc-auth-info '(("freenode" nickserv "luxbock" "Om3napuu"))
-;;             rcirc-server-alist
-;;             '(("b3bai.com" :nick "luxbock" :password "luxbock/freenode:Om3napuu" :full-name "Olli")
-;;               ("b3bai.com" :nick "luxbock" :password "luxbock/EFnet:Om3napuu" :full-name "Olli")))
-;;       (require 'rcirc-color)
-;;       (let ((dir (configuration-layer/get-layer-property 'spacemacs :ext-dir)))
-;;         (require 'rcirc-reconnect
-;;                  (concat dir "rcirc-reconnect/rcirc-reconnect.el")))
-;;       ;; identify info are stored in a separate location, skip errors
-;;       ;; if the feature cannot be found.
-;;       (require 'pinit-rcirc nil 'noerror)
-;;       (define-key rcirc-mode-map (kbd "M-j") 'rcirc-insert-prev-input)
-;;       (define-key rcirc-mode-map (kbd "M-k") 'rcirc-insert-next-input)
-;;       (evil-define-key 'insert rcirc-mode-map (kbd "C-k") 'kill-line))))
-
 (defun luxbock/init-imenu-anywhere ()
   (use-package imenu-anywhere
     :config
@@ -992,14 +545,6 @@
     :config
     (bind-keys ("M-%"   . vr/query-replace)
                ("C-M-%" . vr/replace))))
-
-(defun luxbock/init-yasnippet ()
-  (use-package yasnippet
-    :commands (yas-expand yas-new-snippet)
-    :config
-    (progn
-      (setq yas/root-directory "~/.emacs.d/private/snippets/")
-      (yas/load-directory yas/root-directory))))
 
 (defun luxbock/init-yagist ()
   (use-package yagist))
@@ -1090,284 +635,13 @@
 (defun luxbock/init-rainbow-mode ()
   (use-package rainbow-mode))
 
-(defun luxbock/init-highlight-indentation ()
-  (use-package highlight-indentation))
-
 (defun luxbock/init-paxedit ()
   (use-package paxedit))
-
-(defun luxbock/init-powerline ()
-  (use-package powerline
-    :init
-    (progn
-      ;; Custom format of minor mode lighters, they are separated by a pipe.
-      (defpowerline spacemacs-powerline-minor-modes
-        (mapconcat (lambda (mm)
-                     (propertize
-                      mm
-                      'mouse-face 'mode-line-highlight
-                      'help-echo "Minor mode\n mouse-1: Display minor mode menu\n mouse-2: Show help for minor mode\n mouse-3: Toggle minor modes"
-                      'local-map (let ((map (make-sparse-keymap)))
-                                   (define-key map
-                                     [mode-line down-mouse-1]
-                                     (powerline-mouse 'minor 'menu mm))
-                                   (define-key map
-                                     [mode-line mouse-2]
-                                     (powerline-mouse 'minor 'help mm))
-                                   (define-key map
-                                     [mode-line down-mouse-3]
-                                     (powerline-mouse 'minor 'menu mm))
-                                   (define-key map
-                                     [header-line down-mouse-3]
-                                     (powerline-mouse 'minor 'menu mm))
-                                   map)))
-                   (split-string (format-mode-line minor-mode-alist))
-                   (concat (propertize
-                            (if dotspacemacs-mode-line-unicode-symbols " " "") 'face face)
-                           (unless dotspacemacs-mode-line-unicode-symbols "|"))))
-
-      (defpowerline spacemacs-powerline-new-version
-        (propertize
-         spacemacs-version-check-lighter
-         'mouse-face 'mode-line-highlight
-         'help-echo (format "New version %s | Click with mouse-1 to update (Not Yet Implemented)"
-                            spacemacs-new-version)
-         'local-map (let ((map (make-sparse-keymap)))
-                      (define-key map
-                        [mode-line down-mouse-1]
-                        (lambda (event) (interactive "@e") (message "TODO: update"))
-                        )
-                      map)))
-
-      (defvar spacemacs-mode-line-minor-modesp t
-        "If not nil, minor modes lighter are displayed in the mode-line.")
-      (defun spacemacs/mode-line-minor-modes-toggle ()
-        "Toggle display of minor modes."
-        (interactive)
-        (if spacemacs-mode-line-minor-modesp
-            (setq spacemacs-mode-line-minor-modesp nil)
-          (setq spacemacs-mode-line-minor-modesp t)))
-      (evil-leader/set-key "tmm" 'spacemacs/mode-line-minor-modes-toggle)
-
-      (defvar spacemacs-mode-line-new-version-lighterp t
-        "If not nil, new version lighter is displayed in the mode-line.")
-      (defun spacemacs/mode-line-new-version-lighter-toggle ()
-        "Toggle display of new version lighter."
-        (interactive)
-        (if spacemacs-mode-line-new-version-lighterp
-            (setq spacemacs-mode-line-new-version-lighterp nil)
-          (setq spacemacs-mode-line-new-version-lighterp t)))
-      (evil-leader/set-key "tmv" 'spacemacs/mode-line-new-version-lighter-toggle)
-
-      (defvar spacemacs-mode-line-org-clock-current-taskp t
-        "If not nil, the currently clocked org-mode task will be
-displayed in the mode-line.")
-      (defvar spacemacs-mode-line-org-clock-format-function
-        'org-clock-get-clock-string
-        "Function used to render the currently clocked org-mode task.")
-      (defun spacemacs/mode-line-org-org-clock-current-task-toggle ()
-        (interactive)
-        (if spacemacs-mode-line-new-version-lighterp
-            (setq spacemacs-mode-line-org-clock-current-taskp nil)
-          (setq spacemacs-mode-line-org-clock-current-taskp t)))
-      (evil-leader/set-key "tmc" 'spacemacs/mode-line-org-clock-current-task-toggle)
-
-      (setq-default powerline-default-separator 'wave)
-
-      (defun spacemacs/mode-line-prepare-left ()
-        (let* ((active (powerline-selected-window-active))
-               (line-face (if active 'mode-line 'mode-line-inactive))
-               (face1 (if active 'powerline-active1 'powerline-inactive1))
-               (face2 (if active 'powerline-active2 'powerline-inactive2))
-               (state-face (if active (spacemacs/current-state-face) face2))
-               (window-numberingp (and (boundp 'window-numbering-mode)
-                                       (symbol-value window-numbering-mode)))
-               (anzup (and (boundp 'anzu--state) anzu--state))
-               (flycheckp (and (boundp 'flycheck-mode)
-                               (symbol-value flycheck-mode)
-                               (or flycheck-current-errors
-                                   (eq 'running flycheck-last-status-change))))
-               (vc-face (if (or flycheckp spacemacs-mode-line-minor-modesp)
-                            face1 line-face))
-               (separator-left (intern (format "powerline-%s-%s"
-                                               powerline-default-separator
-                                               (car powerline-default-separator-dir))))
-               (separator-right (intern (format "powerline-%s-%s"
-                                                powerline-default-separator
-                                                (cdr powerline-default-separator-dir)))))
-          (append
-           ;; window number
-           (if (and window-numberingp (spacemacs/window-number))
-               (list (powerline-raw (spacemacs/window-number) state-face))
-             (list (powerline-raw (evil-state-property evil-state :tag t) state-face)))
-           (if (and active anzup)
-               (list (funcall separator-right state-face face1)
-                     (powerline-raw (anzu--update-mode-line) face1)
-                     (funcall separator-right face1 line-face))
-             (list (funcall separator-right state-face line-face)))
-           ;; evil state
-           ;; (powerline-raw evil-mode-line-tag state-face)
-           ;; (funcall separator-right state-face line-face)
-           ;; buffer name
-           (list
-            (powerline-raw "%*" line-face 'l)
-            (powerline-buffer-size line-face 'l)
-            (powerline-buffer-id line-face 'l)
-            (powerline-raw " " line-face)
-            ;; major mode
-            (funcall separator-right line-face face1)
-            (powerline-major-mode face1 'l)
-            (powerline-raw " " face1)
-            (when active
-              (funcall separator-right face1 line-face)))
-           ;; flycheck
-           (when (and active flycheckp)
-             (list (powerline-raw " " line-face)
-                   (powerline-raw (spacemacs|custom-flycheck-lighter error)
-                                  'spacemacs-mode-line-flycheck-error-face)
-                   (powerline-raw (spacemacs|custom-flycheck-lighter warning)
-                                  'spacemacs-mode-line-flycheck-warning-face)
-                   (powerline-raw (spacemacs|custom-flycheck-lighter info)
-                                  'spacemacs-mode-line-flycheck-info-face)))
-           ;; separator between flycheck and minor modes
-           (when (and active flycheckp spacemacs-mode-line-minor-modesp)
-             (list (funcall separator-right line-face face1)
-                   (powerline-raw "  " face1)
-                   (funcall separator-right face1 line-face)))
-           ;; minor modes
-           (when (and active spacemacs-mode-line-minor-modesp)
-             (list (spacemacs-powerline-minor-modes line-face 'l)
-                   (powerline-raw mode-line-process line-face 'l)
-                   (powerline-raw " " line-face)))
-           ;; version control
-           (when (and active (or flycheckp spacemacs-mode-line-minor-modesp))
-             (list (funcall separator-right (if vc-face line-face face1) vc-face)))
-           (if active
-               (list (powerline-vc vc-face)
-                     (powerline-raw " " vc-face)
-                     (funcall separator-right vc-face face2))
-             (list (funcall separator-right face1 face2)))
-           ;; org-mode clocked task
-           (when (and active
-                      (fboundp 'org-clocking-p)
-                      spacemacs-mode-line-org-clock-current-taskp
-                      (org-clocking-p))
-             (list (powerline-raw " " face2)
-                   (funcall spacemacs-mode-line-org-clock-format-function)
-                   (powerline-raw " " face2))))))
-
-      (defun spacemacs/mode-line-prepare-right ()
-        (let* ((active (powerline-selected-window-active))
-               (line-face (if active 'mode-line 'mode-line-inactive))
-               (face1 (if active 'powerline-active1 'powerline-inactive1))
-               (face2 (if active 'powerline-active2 'powerline-inactive2))
-               (state-face (if active (spacemacs/current-state-face) face2))
-               (nyancatp (and (boundp 'nyan-mode) nyan-mode))
-               (batteryp (and (boundp 'fancy-battery-mode)
-                              (symbol-value fancy-battery-mode)))
-               (battery-face (if batteryp (fancy-battery-powerline-face)))
-               (separator-right (intern (format "powerline-%s-%s"
-                                                powerline-default-separator
-                                                (car powerline-default-separator-dir))))
-               (separator-right (intern (format "powerline-%s-%s"
-                                                powerline-default-separator
-                                                (cdr powerline-default-separator-dir)))))
-          (append
-           ;; battery
-           (if (and active batteryp)
-               (list (funcall separator-right face2 battery-face)
-                     (powerline-raw (fancy-battery-default-mode-line)
-                                    battery-face 'r)
-                     (funcall separator-right battery-face face1))
-             (list (funcall separator-right face2 face1)))
-           (list
-            ;; row:column
-            (powerline-raw " " face1)
-            (powerline-raw
-             (concat (format "(%d) " (point))
-                     "%l:%2c")
-             face1 'r)
-            (funcall separator-right face1 line-face)
-            (powerline-raw " " line-face))
-           (list
-            ;; global-mode
-            (unless (equal '("") global-mode-string)
-              (powerline-raw global-mode-string)
-              (powerline-raw " " line-face))
-            ;; new version
-            (if (and active
-                     spacemacs-new-version
-                     spacemacs-mode-line-new-version-lighterp)
-                (spacemacs-powerline-new-version
-                 (spacemacs/get-new-version-lighter-face
-                  spacemacs-version spacemacs-new-version) 'r)))
-           (when (and active (not nyancatp))
-             (let ((progress (format-mode-line "%p")))
-               (list
-                ;; percentage in the file
-                (powerline-raw "%p" line-face 'r)
-                ;; display hud
-                (powerline-chamfer-left line-face face1)
-                (if (string-match "\%" progress)
-                    (powerline-hud state-face face1))))))))
-
-      (defun spacemacs/mode-line-prepare ()
-        (let* ((active (powerline-selected-window-active))
-               (face2 (if active 'powerline-active2 'powerline-inactive2))
-               (lhs (spacemacs/mode-line-prepare-left))
-               (rhs (spacemacs/mode-line-prepare-right))
-               (nyancatp (and (boundp 'nyan-mode) nyan-mode)))
-          (concat (powerline-render lhs)
-                  (when (and active nyancatp)
-                    (powerline-render (spacemacs/powerline-nyan-cat)))
-                  (powerline-fill face2 (powerline-width rhs))
-                  (powerline-render rhs))))
-
-      (setq-default mode-line-format
-                    '("%e" (:eval (spacemacs/mode-line-prepare))))
-
-      (defun spacemacs//set-powerline-for-startup-buffers ()
-        "Set the powerline for buffers created when Emacs starts."
-        (dolist (buffer '("*Messages*" "*spacemacs*" "*Compile-Log*"))
-          (when (get-buffer buffer)
-            (with-current-buffer buffer
-              (setq-local mode-line-format
-                          '("%e" (:eval (spacemacs/mode-line-prepare))))
-              (powerline-set-selected-window)
-              (powerline-reset)))))
-      (add-hook 'after-init-hook
-                'spacemacs//set-powerline-for-startup-buffers))))
-
-(defun luxbock/init-helm-swoop ()
-  (use-package helm-swoop
-    :defer t
-    :init
-    (setq helm-swoop-split-with-multiple-windows t
-          helm-swoop-split-direction 'split-window-vertically
-          helm-swoop-split-window-function 'helm-default-display-buffer
-          helm-swoop-pre-input-function (lambda () ""))
-    (evil-leader/set-key
-      "sS"    'helm-multi-swoop
-      "ss"    'helm-swoop
-      "s C-s" 'helm-multi-swoop-all)
-    (defadvice helm-swoop (before add-evil-jump activate)
-      (when (configuration-layer/package-declaredp 'evil-jumper)
-        (evil-set-jump)))))
-
-;; (defun luxbock/init-swiper-helm ()
-;;   (use-package swiper-helm
-;;     :defer t
-;;     :init
-;;     (progn
-;;       (evil-leader/set-key "ss" 'swiper-helm)
-;;       (defadvice swiper-helm (before add-evil-jump activate)
-;;         (when (configuration-layer/package-declaredp 'evil-jumper)
-;;           (evil-set-jump))))))
 
 (defun luxbock/init-engine-mode ()
   "From: https://github.com/hrs/engine-mode"
   (use-package engine-mode
-    :defer t
+    :commands engine-mode
     :config
     (progn
       (defengine google
@@ -1382,3 +656,25 @@ displayed in the mode-line.")
       (defengine wikipedia
         "http://www.wikipedia.org/search-redirect.php?language=en&go=Go&search=%s"
         "w"))))
+
+(defun luxbock/init-ox-gfm ()
+  (use-package org-gfm)
+  )
+
+(defun luxbock/init-srefactor ()
+  (use-package srefactor
+    :defer t
+    :init
+    (progn
+      (defun luxbock/lazy-load-srefactor ()
+        "Lazy loads srefactor for lisp"
+        (require 'srefactor-lisp)
+        (dolist (m '(clojure-mode emacs-lisp-mode))
+          (eval
+           `(progn
+              (evil-leader/set-key-for-mode (quote ,m) "mfb" 'srefactor-lisp-format-buffer)
+              (evil-leader/set-key-for-mode (quote ,m) "mfd" 'srefactor-lisp-format-defun)
+              (evil-leader/set-key-for-mode (quote ,m) "mfr" 'srefactor-lisp-format-sexp)
+              (evil-leader/set-key-for-mode (quote ,m) "mfo" 'srefactor-lisp-one-line)))))
+      (add-hook 'clojure-mode-hook 'luxbock/lazy-load-srefactor)
+      (add-hook 'emacs-lisp-mode-hook 'luxbock/lazy-load-srefactor))))
