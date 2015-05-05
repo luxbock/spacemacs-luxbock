@@ -1,4 +1,4 @@
-(defvar luxbock-packages
+(setq luxbock-packages
   '(org
     ox-gfm
     ace-jump-mode
