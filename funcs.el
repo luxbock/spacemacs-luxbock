@@ -703,7 +703,8 @@ as the default task."
         (set-window-buffer this-window other-buffer)
         (set-window-buffer other-window this-buffer)
         (set-window-start this-window other-start)
-        (set-window-start other-window this-start)))))
+        (set-window-start other-window this-start)
+        (select-window other-window)))))
 
 (defun swap-with-left () (interactive) (swap-window 'left))
 (defun swap-with-down () (interactive) (swap-window 'down))
@@ -725,3 +726,46 @@ as the default task."
     (if b (switch-to-buffer b)
       (execute-kbd-macro (kbd "C-c a SPC"))
       (switch-to-buffer b))))
+
+(defun apropos-face (pattern)
+  (interactive
+   (list (apropos-read-pattern "symbol")))
+  (apropos-parse-pattern pattern)
+  (apropos-symbols-internal (apropos-internal apropos-regexp 'facep) t))
+
+(defun luxbock/clj-eval-with-args (arg)
+  (interactive "P")
+  (save-excursion
+    (sp-beginning-of-sexp)
+    (let ((sap (symbol-at-point)))
+      (cider-interactive-eval
+       (format "(%s %s)" sap
+               (read-string (format "Call \"%s\" with: " sap)))))))
+
+(defun luxbock/show-atreus-layout ()
+  (interactive)
+  (find-file "/Users/Olli/spacemacs-luxbock/atreus/layout-all.svg"))
+
+
+(defvar luxbock/command-is-meta nil)
+
+(defun luxbock/swap-command-key ()
+  "Toggles the functionality of the Command and Option keys on a Mac."
+  (interactive)
+  (if luxbock/command-is-meta
+      (setq mac-command-modifier 'super
+            mac-option-modifier 'meta
+            luxbock/command-is-meta nil)
+    (setq mac-command-modifier 'meta
+          mac-option-modifier 'super
+          luxbock/command-is-meta t))
+  (message
+   (format "Meta is %s"
+           (if luxbock/command-is-meta "Command" "Alt"))))
+
+;;; Eshell alises
+(defun eshell/clear ()           (recenter 0))
+(defun eshell/ll    (&rest args) (apply 'eshell/ls args))
+(defun eshell/d     (dir)        (dired dir))
+(defun eshell/ff    (file)       (find-file file))
+(defun eshell/fx    (file)       (find-file-other-window file))

@@ -7,33 +7,18 @@
     visual-regexp-steroids
     dired-subtree
     dired-filter
-    yagist
     git-auto-commit-mode
     drag-stuff
     tiny
     htmlize
     multiple-cursors
-    rainbow-mode
+    rainbow
     paxedit
-    engine-mode
-    srefactor
-    ))
-
-;; (defun luxbock/init-org-projectile ()
-;;   (use-package org-projectile
-;;     ;; :bind ("C-c n p" . org-projectile:template-or-project)
-;;     :init
-;;     (progn
-;;       (setq org-projectile:projects-file "~/org/projects.org")
-;;       (setq org-projectile:capture-template "* TODO %?\n%U\n")
-;;       (add-to-list 'org-capture-templates
-;;                    (org-projectile:project-todo-entry
-;;                     "p" "* TODO %?\n%U\n" "Project Todo"))
-;;       (add-to-list 'org-capture-templates
-;;                    (org-projectile:project-todo-entry
-;;                     "N" "* %? :NOTE:\n%U\n" "Project Note"))
-;;       )
-;;     :ensure t))
+    edn
+    typed-clojure-mode
+    scratch
+    feature-mode
+    evil-cleverparens))
 
 (defun luxbock/init-org ()
   (use-package org
@@ -43,30 +28,32 @@
     (progn
       (setq org-log-done t)
       (setq org-agenda-window-setup 'current-window)
+      (spacemacs/set-leader-keys-for-major-mode 'org-mode
+        "k" 'outline-previous-visible-heading
+        "j" 'outline-next-visible-heading
+        "h" 'outline-up-heading
+        "y" 'op/org-extract-link
+        "c" 'org-capture
+        "d" 'org-deadline
+        "e" 'org-export-dispatch
+        "i" 'org-clock-in
+        "o" 'org-clock-out
+        "m" 'org-ctrl-c-ctrl-c
+        "r" 'org-refile
+        "s" 'org-schedule
+        "t" 'org-todo)
+
       (add-hook 'org-mode-hook 'org-indent-mode)
-      (evil-leader/set-key-for-mode 'org-mode
-        "ot" 'org-capture
-        "oa" 'org-agenda
-        "mk" 'outline-previous-visible-heading
-        "mj" 'outline-next-visible-heading
-        "mh" 'outline-up-heading
-        "my" 'op/org-extract-link
-        "mc" 'org-capture
-        "md" 'org-deadline
-        "me" 'org-export-dispatch
-        "mi" 'org-clock-in
-        "mo" 'org-clock-out
-        "mm" 'org-ctrl-c-ctrl-c
-        "mr" 'org-refile
-        "ms" 'org-schedule
-        "mt" 'org-todo)
+      (add-hook 'org-mode-hook 'auto-fill-mode)
+      (add-hook 'org-capture-mode-hook 'evil-insert-state)
 
       (eval-after-load "org-agenda"
         '(progn
            (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
            (define-key org-agenda-mode-map "k" 'org-agenda-previous-line)
            (define-key org-agenda-mode-map
-             (kbd "SPC") evil-leader--default-map))))
+             (kbd "SPC") spacemacs-default-map))))
+
     :config
     (progn
       (require 'org)
@@ -82,7 +69,16 @@
       (global-set-key (kbd "C-c l") 'org-store-link)
       (global-set-key (kbd "C-c a") 'org-agenda)
       (global-set-key (kbd "C-c c") 'org-capture)
+
       (define-key org-mode-map (kbd "C-c k") 'org-cut-subtree)
+      (define-key org-mode-map (kbd "M-j") 'org-metadown)
+      (define-key org-mode-map (kbd "M-k") 'org-metaup)
+      (define-key org-mode-map (kbd "M-h") 'org-metaleft)
+      (define-key org-mode-map (kbd "M-l") 'org-metaright)
+      (define-key org-mode-map (kbd "M-J") 'org-shiftmetadown)
+      (define-key org-mode-map (kbd "M-K") 'org-shiftmetaup)
+      (define-key org-mode-map (kbd "M-H") 'org-shiftmetaleft)
+      (define-key org-mode-map (kbd "M-L") 'org-shiftmetaright)
 
       ;; Open normal agenda view
       (global-set-key (kbd "<f9> SPC")
@@ -248,7 +244,7 @@
 
       (add-hook 'org-insert-heading-hook 'bh/insert-heading-inactive-timestamp 'append)
 
-      (evil-leader/set-key-for-mode 'org-mode "oi" 'bh/insert-inactive-timestamp)
+      ;; (spacemacs/set-leader-keys-for-major-mode 'org-mode "oi" 'bh/insert-inactive-timestamp)
       (global-set-key (kbd "<f9> t") 'bh/toggle-insert-inactive-timestamp)
 
       ;; Agenda Mode Keys
@@ -525,17 +521,17 @@
     (progn
       (add-hook 'ace-jump-mode-before-jump-hook 'evil-set-jump)
       (add-hook 'ace-jump-mode-end-hook 'golden-ratio)
-      (evil-leader/set-key "SPC" 'evil-ace-jump-word-mode)
-      (evil-leader/set-key "l" 'evil-ace-jump-line-mode))
+      (spacemacs/set-leader-keys "SPC" 'evil-ace-jump-word-mode)
+      (spacemacs/set-leader-keys "l" 'evil-ace-jump-line-mode))
     :config
     (progn
       (setq ace-jump-mode-scope 'window)
-      (evil-leader/set-key "`" 'ace-jump-mode-pop-mark))))
+      (spacemacs/set-leader-keys "`" 'ace-jump-mode-pop-mark))))
 
 (defun luxbock/init-imenu-anywhere ()
   (use-package imenu-anywhere
     :config
-    (evil-leader/set-key "hi" 'helm-imenu-anywhere)))
+    (spacemacs/set-leader-keys "hi" 'helm-imenu-anywhere)))
 
 (defun luxbock/init-clojure-mode-extra-font-locking ()
   (use-package clojure-mode-extra-font-locking))
@@ -546,20 +542,15 @@
     (bind-keys ("M-%"   . vr/query-replace)
                ("C-M-%" . vr/replace))))
 
-(defun luxbock/init-yagist ()
-  (use-package yagist))
-
 (defun luxbock/init-git-auto-commit-mode ()
   (use-package git-auto-commit-mode))
 
 (defun luxbock/init-drag-stuff ()
   (use-package drag-stuff
     :config
-    (bind-keys
-     ("M-j" . drag-stuff-down)
-     ("M-k" . drag-stuff-up)
-     ("M-h" . drag-stuff-left)
-     ("M-l" . drag-stuff-right))))
+    (progn
+      (setq drag-stuff-except-modes '(org-mode emacs-lisp-mode clojure-mode))
+      (drag-stuff-global-mode t))))
 
 (defun luxbock/init-dired-filter ()
   (use-package dired-filter))
@@ -638,43 +629,33 @@
 (defun luxbock/init-paxedit ()
   (use-package paxedit))
 
-(defun luxbock/init-engine-mode ()
-  "From: https://github.com/hrs/engine-mode"
-  (use-package engine-mode
-    :commands engine-mode
+(defun luxbock/init-ox-gfm ()
+  (use-package org-gfm))
+
+(defun luxbock/init-typed-clojure-mode ()
+  (use-package typed-clojure-mode))
+
+(defun luxbock/init-edn ()
+  (use-package edn))
+
+(defun luxbock/init-scratch ()
+  (use-package scratch
+   :commands scratch
+   :init
+   (spacemacs/set-leader-keys "os" 'scratch)))
+
+(defun luxbock/init-feature-mode ()
+  (use-package feature-mode
+    :mode ("\\.feature$" . feature-mode)
+    :diminish "fm"))
+
+(defun luxbock/init-evil-cleverparens ()
+  (use-package evil-cleverparens
     :config
     (progn
-      (defengine google
-        "http://www.google.com/search?ie=utf-8&oe=utf-8&q=%s"
-        "SPC")
-      (defengine github
-        "https://github.com/search?ref=simplesearch&q=%s" "g")
-      (defengine stack-overflow
-        "https://stackoverflow.com/search?q=%s" "s")
-      (defengine twitter
-        "https://twitter.com/search?q=%s" "t")
-      (defengine wikipedia
-        "http://www.wikipedia.org/search-redirect.php?language=en&go=Go&search=%s"
-        "w"))))
-
-(defun luxbock/init-ox-gfm ()
-  (use-package org-gfm)
-  )
-
-(defun luxbock/init-srefactor ()
-  (use-package srefactor
-    :defer t
-    :init
-    (progn
-      (defun luxbock/lazy-load-srefactor ()
-        "Lazy loads srefactor for lisp"
-        (require 'srefactor-lisp)
-        (dolist (m '(clojure-mode emacs-lisp-mode))
-          (eval
-           `(progn
-              (evil-leader/set-key-for-mode (quote ,m) "mfb" 'srefactor-lisp-format-buffer)
-              (evil-leader/set-key-for-mode (quote ,m) "mfd" 'srefactor-lisp-format-defun)
-              (evil-leader/set-key-for-mode (quote ,m) "mfr" 'srefactor-lisp-format-sexp)
-              (evil-leader/set-key-for-mode (quote ,m) "mfo" 'srefactor-lisp-one-line)))))
-      (add-hook 'clojure-mode-hook 'luxbock/lazy-load-srefactor)
-      (add-hook 'emacs-lisp-mode-hook 'luxbock/lazy-load-srefactor))))
+      (setq evil-cleverparens-use-additional-bindings t)
+      (setq evil-cleverparens-swap-move-by-word-and-symbol t)
+      (dolist (this-hook '(cider-repl-mode-hook
+                           cider-mode-hook
+                           emacs-lisp-mode-hook))
+        (add-hook this-hook #'evil-cleverparens-mode)))))
