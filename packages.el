@@ -367,7 +367,8 @@
                                         ; global Effort estimate values
                                         ; global STYLE property values for completion
       (setq org-global-properties '(("Effort_ALL" . "0:05 0:10 0:15 0:30 0:45 1:00 2:00 3:00 5:00 0:00")
-                                    ("STYLE_ALL" . "habit")))
+                                    ; ("STYLE_ALL" . "habit")
+                                    ))
 
       ;; Agenda View -- LONG
       ;; How the windows get split
