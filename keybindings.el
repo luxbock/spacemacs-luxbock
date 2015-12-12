@@ -40,3 +40,4 @@
 
 (evil-define-key 'insert global-map (kbd "C-e") 'move-end-of-line)
 (evil-define-key 'insert global-map (kbd "C-a") 'beginning-of-line)
+(evil-define-key 'insert global-map (kbd "C-k") 'kill-line)

@@ -31,6 +31,7 @@
       (spacemacs/set-leader-keys-for-major-mode 'org-mode
         "k" 'outline-previous-visible-heading
         "j" 'outline-next-visible-heading
+        "p" 'org-priority
         "h" 'outline-up-heading
         "y" 'op/org-extract-link
         "c" 'org-capture

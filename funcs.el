@@ -769,3 +769,19 @@ as the default task."
 (defun eshell/d     (dir)        (dired dir))
 (defun eshell/ff    (file)       (find-file file))
 (defun eshell/fx    (file)       (find-file-other-window file))
+
+;; Calling JSON end-points
+(defun luxbock/get-json (url)
+  (let ((url-request-method "GET"))
+    (with-current-buffer (url-retrieve-synchronously url)
+      (goto-char url-http-end-of-headers)
+      (let ((json-object-type 'plist)
+            (json-key-type 'keyword)
+            (json-array-type 'vector))
+        (json-read)))))
+
+(defun luxbock/btc-price ()
+  "Calls the Bitstamp API to retrieve the latest Bitcoin price,
+  returning it as a string."
+  (let ((result (luxbock/get-json "https://www.bitstamp.net/api/ticker/")))
+    (string-to-number (plist-get result :last))))
