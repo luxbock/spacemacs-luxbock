@@ -502,7 +502,8 @@
             org-agenda-skip-timestamp-if-done t)
 
                                         ; position the habit graph on the agenda to the right of the default
-      (setq org-habit-graph-column 40
+      (setq org-habit-show-habits nil
+            org-habit-graph-column 40
             org-habit-show-habits-only-for-today t
             org-habit-following-days 2
             org-habit-preceding-days 42
