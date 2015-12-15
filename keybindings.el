@@ -42,3 +42,5 @@
 (evil-define-key 'insert global-map (kbd "C-k") 'kill-line)
 
 (evil-define-key 'insert eshell-mode-map (kbd "C-k") 'kill-line)
+
+(evil-global-set-key 'insert (kbd "C-d") 'delete-char)
