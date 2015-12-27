@@ -13,6 +13,7 @@
 
   "nd" 'narrow-or-widen-dwim
 
+  "oa" 'helm-org-agenda-files-headings
   "om" 'luxbock/copy-last-message
   "ow" 'whitespace-cleanup
   "oh" 'mark-whole-buffer
