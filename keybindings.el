@@ -13,7 +13,7 @@
 
   "nd" 'narrow-or-widen-dwim
 
-  "om" 'op/copy-last-message
+  "om" 'luxbock/copy-last-message
   "ow" 'whitespace-cleanup
   "oh" 'mark-whole-buffer
   "or" 'regexp-builder
