@@ -662,7 +662,7 @@ as the default task."
         (setq pos (match-end 0)))
       matches)))
 
-(defun op/copy-last-message (p)
+(defun luxbock/copy-last-message (p)
   "Copies the last line of *Messages* to kill-ring. Will strip
   the [times N] string at the end of the line for commands that
   were repeated.
