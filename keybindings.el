@@ -18,8 +18,7 @@
   "oh" 'mark-whole-buffer
   "or" 'regexp-builder
   "ox" 'luxbock/swap-command-key
-  ;; "oa"  'luxbock/switch-to-default-agenda-view
-  "ot"  'org-capture
+  "ot"  'helm-org-capture-templates
   "wf"  'spacemacs/toggle-fullscreen
   "oci" 'bh/punch-in
   "ocs" 'bh/punch-out
