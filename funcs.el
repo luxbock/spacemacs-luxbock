@@ -640,7 +640,7 @@ as the default task."
 
 :;; Emacs Lisp
 
-(defun op/eval-and-replace ()
+(defun luxbock/eval-and-replace ()
   "Replace the preceding sexp with its value."
   (interactive)
   (backward-kill-sexp)
