@@ -33,7 +33,7 @@
 
 (evil-define-key 'normal global-map "K" 'helm-show-kill-ring)
 
-(spacemacs/set-leader-keys "om" 'op/copy-last-message)
+(spacemacs/set-leader-keys "om" 'luxbock/copy-last-message)
 
 (define-key evil-normal-state-map (kbd "M-DEL") 'evil-window-map)
 
