@@ -80,7 +80,7 @@
 
 :;; Emacs Lisp
 
-(defun luxbock/eval-and-replace ()
+(defun lux/eval-and-replace ()
   "Replace the preceding sexp with its value."
   (interactive)
   (backward-kill-sexp)
