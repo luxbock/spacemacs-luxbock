@@ -3,29 +3,28 @@
 (spacemacs/declare-prefix "y" "yasnippet")
 
 (spacemacs/set-leader-keys
-  "ws" 'cofi/smart-split
+  "ws"    'lux/smart-split
   "w C-l" 'swap-with-right
   "w C-h" 'swap-with-left
   "w C-j" 'swap-with-down
   "w C-k" 'swap-with-up
 
-  "fS" 'save-some-buffers
+  "fS"    'save-some-buffers
 
-  "nd" 'narrow-or-widen-dwim
+  "nd"    'narrow-or-widen-dwim
 
-  "oa" 'helm-org-agenda-files-headings
-  "om" 'luxbock/copy-last-message
-  "ow" 'whitespace-cleanup
-  "oh" 'mark-whole-buffer
-  "or" 'regexp-builder
-  "ox" 'luxbock/swap-command-key
-  "ot"  'helm-org-capture-templates
-  "wf"  'spacemacs/toggle-fullscreen
-  "oci" 'bh/punch-in
-  "ocs" 'bh/punch-out
-  "oco" 'org-clock-out
-  "ocg" 'org-clock-goto
-  "occ" 'org-clock-cancel)
+  "oa"    'helm-org-agenda-files-headings
+  "om"    'luxb/copy-last-message
+  "ow"    'whitespace-cleanup
+  "oh"    'mark-whole-buffer
+  "or"    'regexp-builder
+  "ox"    'luxbock/swap-command-key
+  "ot"    'helm-org-capture-templates
+  "wf"    'spacemacs/toggle-fullscreen
+  "oci"   'org-clock-in
+  "oco"   'org-clock-out
+  "ocg"   'org-clock-goto
+  "occ"   'org-clock-cancel)
 
 
 (global-set-key (kbd "C-x C-k") 'kill-buffer)
