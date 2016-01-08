@@ -18,17 +18,17 @@
 (defun luxbock/init-org-projectile ()
   (require 'org-projectile)
   (setq org-projectile:projects-file "~/org/projects.org")
-  (setq luxbock/org-projectile-todo-template "* TODO %? @%A\n%U\n")
-  (setq luxbock/org-projectile-note-template "* %? :NOTE:\n%U\n")
+  (setq lux/org-projectile-todo-template "* TODO %? @%A\n%U\n")
+  (setq lux/org-projectile-note-template "* %? :NOTE:\n%U\n")
 
-  (defun luxbock/org-projectile-capture-for-current-project (arg)
+  (defun lux/org-projectile-capture-for-current-project (arg)
     (interactive "P")
-    (let ((template (if arg luxbock/org-projectile-note-template
-                      luxbock/org-projectile-todo-template)))
+    (let ((template (if arg lux/org-projectile-note-template
+                      lux/org-projectile-todo-template)))
       (org-projectile:capture-for-current-project template)))
 
   (spacemacs/set-leader-keys
-    "op" 'luxbock/org-projectile-capture-for-current-project))
+    "op" 'lux/org-projectile-capture-for-current-project))
 
 (defun luxbock/init-material-theme ()
   (add-to-list 'custom-theme-load-path "~/spacemacs-luxbock/extensions/emacs-material-theme"))
