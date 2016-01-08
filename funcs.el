@@ -2,7 +2,7 @@
 
 (setq min-window-width (* 2 81))
 
-(defun cofi/smart-split ()
+(defun lux/smart-split ()
   "Split window vertically or horizontally in a smart way."
   (interactive)
   (if (or (< (frame-width) min-window-width)
@@ -102,7 +102,7 @@
         (setq pos (match-end 0)))
       matches)))
 
-(defun luxbock/copy-last-message (p)
+(defun lux/copy-last-message (p)
   "Copies the last line of *Messages* to kill-ring. Will strip
   the [times N] string at the end of the line for commands that
   were repeated.
