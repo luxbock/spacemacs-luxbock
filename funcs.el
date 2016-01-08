@@ -160,20 +160,13 @@
     (setq eshell-path-env path-from-shell) ; for eshell users
     (setq exec-path (split-string path-from-shell path-separator))))
 
-(defun luxbock/switch-to-default-agenda-view (arg)
-  (interactive "p")
-  (let ((b (get-buffer "*Org Agenda( )*")))
-    (if b (switch-to-buffer b)
-      (execute-kbd-macro (kbd "C-c a SPC"))
-      (switch-to-buffer b))))
-
 (defun apropos-face (pattern)
   (interactive
    (list (apropos-read-pattern "symbol")))
   (apropos-parse-pattern pattern)
   (apropos-symbols-internal (apropos-internal apropos-regexp 'facep) t))
 
-(defun luxbock/clj-eval-with-args (arg)
+(defun lux/clj-eval-with-args (arg)
   (interactive "P")
   (save-excursion
     (sp-beginning-of-sexp)
