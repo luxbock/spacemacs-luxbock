@@ -211,7 +211,7 @@
 (defun eshell/fx    (file)       (find-file-other-window file))
 
 ;; Calling JSON end-points
-(defun luxbock/get-json (url)
+(defun lux/get-json (url)
   (let ((url-request-method "GET"))
     (with-current-buffer (url-retrieve-synchronously url)
       (goto-char url-http-end-of-headers)
@@ -220,8 +220,8 @@
             (json-array-type 'vector))
         (json-read)))))
 
-(defun luxbock/btc-price ()
+(defun lux/btc-price ()
   "Calls the Bitstamp API to retrieve the latest Bitcoin price,
   returning it as a string."
-  (let ((result (luxbock/get-json "https://www.bitstamp.net/api/ticker/")))
+  (let ((result (lux/get-json "https://www.bitstamp.net/api/ticker/")))
     (string-to-number (plist-get result :last))))
