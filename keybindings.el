@@ -14,11 +14,11 @@
   "nd"    'narrow-or-widen-dwim
 
   "oa"    'helm-org-agenda-files-headings
-  "om"    'luxb/copy-last-message
+  "om"    'lux/copy-last-message
   "ow"    'whitespace-cleanup
   "oh"    'mark-whole-buffer
   "or"    'regexp-builder
-  "ox"    'luxbock/swap-command-key
+  "ox"    'lux/swap-command-key
   "ot"    'helm-org-capture-templates
   "wf"    'spacemacs/toggle-fullscreen
   "oci"   'org-clock-in
