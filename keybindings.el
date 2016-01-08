@@ -26,13 +26,10 @@
   "ocg"   'org-clock-goto
   "occ"   'org-clock-cancel)
 
-
 (global-set-key (kbd "C-x C-k") 'kill-buffer)
 (global-set-key (kbd "C-j") 'newline-and-indent)
 
 (evil-define-key 'normal global-map "K" 'helm-show-kill-ring)
-
-(spacemacs/set-leader-keys "om" 'luxbock/copy-last-message)
 
 (define-key evil-normal-state-map (kbd "M-DEL") 'evil-window-map)
 
