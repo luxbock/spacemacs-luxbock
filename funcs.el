@@ -189,7 +189,7 @@
 
 (defvar luxbock/command-is-meta nil)
 
-(defun luxbock/swap-command-key ()
+(defun lux/swap-command-key ()
   "Toggles the functionality of the Command and Option keys on a Mac."
   (interactive)
   (if luxbock/command-is-meta
