@@ -218,3 +218,34 @@
   returning it as a string."
   (let ((result (lux/get-json "https://www.bitstamp.net/api/ticker/")))
     (string-to-number (plist-get result :last))))
+
+;;; ERC randomness
+
+(defun lux/-users-for-channel (channel-buffer)
+  (with-current-buffer channel-buffer
+    (let ((nick (erc-current-nick)))
+      (-remove (lambda (user) (member user `(,nick "chanserv")))
+               (hash-table-keys erc-channel-users)))))
+
+(defun lux/pick-two (list)
+  (-mapcat (lambda (sublist)
+             (-map (lambda (x) (list (car sublist) x))
+                   (cdr sublist)))
+           (-iterate 'cdr list (length list))))
+
+(defun lux/erc-shared-users (&rest channels)
+  (let ((chan->users (make-hash-table))
+        (union->users (make-hash-table))
+        return)
+    (dolist (c channels)
+      (puthash c (lux/-users-for-channel c) chan->users))
+    (dolist (channels (lux/pick-two channels))
+      (let ((shared
+             (reduce (lambda (acc users)
+                       (intersection acc users :test 'string-equal))
+                     (-map (lambda (ch)
+                             (gethash ch chan->users))
+                           channels))))
+        (when shared
+          (setq return (cons (list channels shared) return)))))
+    return))
