@@ -213,6 +213,11 @@
             (json-array-type 'vector))
         (json-read)))))
 
+(defun lux/forex (from to)
+  (let ((result (lux/get-json (concat "https://api.fixer.io/latest?base=" from))))
+    (plist-get (plist-get result :rates)
+               (intern (concat ":" to)))))
+
 (defun lux/btc-price ()
   "Calls the Bitstamp API to retrieve the latest Bitcoin price,
   returning it as a string."
