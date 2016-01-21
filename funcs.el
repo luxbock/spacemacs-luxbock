@@ -254,3 +254,45 @@
         (when shared
           (setq return (cons (list channels shared) return)))))
     return))
+
+;;; Indentation
+
+(defun lux/align-dwim ()
+  (interactive)
+  (let ((n-spaces (lambda (n) (insert (apply 'concat (-repeat n " ")))))))
+  (if (evil-visual-state-p)
+      (destructuring-bind (beg end &rest) (evil-visual-range)
+        (let ((regx (read-regexp "Align regexp: "))
+              (lc   (count-lines beg end))
+              matches)
+          (save-excursion
+            (goto-char beg)
+            (dotimes (i lc)
+              (let ((begl (beginning-of-line)))
+                (when (search-forward-regexp regx (point-at-eol) t)
+                  (goto-char (match-beginning 0))
+                  (setq matches (cons (list begl (current-column)) matches))
+                  (forward-line))))
+            (when matches
+              (let ((furthest (-max (mapcat 'cadar matches)))))
+              (dolist (pair matches)
+                (destructuring-bind (b m) pair
+                  (goto-char b)
+                  ))))))
+    (let* ((col (current-column))
+           (last-char (save-excursion
+                        (when (evil-insert-state-p)
+                          (backward-char))
+                        (thing-at-point 'char)))
+           (p-col (save-excursion
+                    (forward-line -1)
+                    (evil-forward-char col)
+                    (when (search-forward last-char (point-at-eol) t)
+                      (current-column)))))
+      (when p-col
+        (let ((offset (- p-col col)))
+          (if (evil-normal-state-p)
+              (funcall 'n-spaces (1- offset))
+            (backward-char)
+            (funcall 'n-spaces offset)
+            (forward-char)))))))
