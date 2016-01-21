@@ -271,14 +271,14 @@
               (let ((begl (beginning-of-line)))
                 (when (search-forward-regexp regx (point-at-eol) t)
                   (goto-char (match-beginning 0))
-                  (setq matches (cons (list begl (current-column)) matches))
+                  (setq matches (cons (current-column) matches))
                   (forward-line))))
             (when matches
-              (let ((furthest (-max (mapcat 'cadar matches)))))
-              (dolist (pair matches)
-                (destructuring-bind (b m) pair
-                  (goto-char b)
-                  ))))))
+              (let ((furthest (-max matches)))
+                (dolist (m matches)
+                  (when (< m furthest)
+                    (goto-char m)
+                    (funcall 'n-spaces (- furthest m)))))))))
     (let* ((col (current-column))
            (last-char (save-excursion
                         (when (evil-insert-state-p)
