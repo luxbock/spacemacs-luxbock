@@ -196,6 +196,11 @@
    (format "Meta is %s"
            (if luxbock/command-is-meta "Command" "Alt"))))
 
+(defun lux/insert-space-in-front ()
+  (interactive)
+  (insert " ")
+  (backward-char))
+
 ;;; Eshell alises
 (defun eshell/clear ()           (recenter 0))
 (defun eshell/ll    (&rest args) (apply 'eshell/ls args))
