@@ -261,7 +261,6 @@
     return))
 
 ;;; Indentation
-
 (defun lux/align-dwim ()
   (interactive)
   (let ((n-spaces (lambda (n) (insert (apply 'concat (-repeat n " ")))))))
@@ -301,3 +300,23 @@
             (backward-char)
             (funcall 'n-spaces offset)
             (forward-char)))))))
+
+;; Newlines
+(defun lux/newline-below-dont-move (c)
+  (interactive "p")
+  (save-excursion
+    (forward-line)
+    (dotimes (_ c) (insert "\n"))))
+
+(defun lux/newline-above-dont-move (c)
+  (interactive "p")
+  (save-excursion
+    (beginning-of-line)
+    (dotimes (_ c) (insert "\n"))))
+
+(defun lux/newline-above-and-indent ()
+  (interactive)
+  (beginning-of-line)
+  (insert "\n")
+  (forward-line -1)
+  (indent-according-to-mode))
