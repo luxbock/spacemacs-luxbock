@@ -26,25 +26,6 @@
   "ocg"   'org-clock-goto
   "occ"   'org-clock-cancel)
 
-(defun lux/newline-below-dont-move (c)
-  (interactive "p")
-  (save-excursion
-    (forward-line)
-    (dotimes (_ c) (insert "\n"))))
-
-(defun lux/newline-above-dont-move (c)
-  (interactive "p")
-  (save-excursion
-    (beginning-of-line)
-    (dotimes (_ c) (insert "\n"))))
-
-(defun lux/newline-above-and-indent ()
-  (interactive)
-  (beginning-of-line)
-  (insert "\n")
-  (forward-line -1)
-  (indent-according-to-mode))
-
 (global-set-key (kbd "C-x C-k") 'kill-buffer)
 
 (global-set-key (kbd "C-j") 'newline-and-indent)
