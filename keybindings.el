@@ -26,9 +26,31 @@
   "ocg"   'org-clock-goto
   "occ"   'org-clock-cancel)
 
+(defun lux/newline-below-dont-move (c)
+  (interactive "p")
+  (save-excursion
+    (forward-line)
+    (dotimes (_ c) (insert "\n"))))
+
+(defun lux/newline-above-dont-move (c)
+  (interactive "p")
+  (save-excursion
+    (beginning-of-line)
+    (dotimes (_ c) (insert "\n"))))
+
+(defun lux/newline-above-and-indent ()
+  (interactive)
+  (beginning-of-line)
+  (insert "\n")
+  (forward-line -1)
+  (indent-according-to-mode))
+
 (global-set-key (kbd "C-x C-k") 'kill-buffer)
 (global-set-key (kbd "C-j") 'newline-and-indent)
+(global-set-key (kbd "C-S-j") 'lux/newline-below-dont-move)
 
+(evil-define-key 'normal global-map (kbd "C-k") 'lux/newline-above-and-indent)
+(evil-define-key 'normal global-map (kbd "C-S-k") 'lux/newline-above-dont-move)
 (evil-define-key 'normal global-map "K" 'helm-show-kill-ring)
 
 (define-key evil-normal-state-map (kbd "M-DEL") 'evil-window-map)
