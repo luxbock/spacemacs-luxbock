@@ -261,6 +261,7 @@
     return))
 
 ;;; Indentation
+;; TODO: haven't tested this yet
 (defun lux/align-dwim ()
   (interactive)
   (let ((n-spaces (lambda (n) (insert (apply 'concat (-repeat n " ")))))))
