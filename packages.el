@@ -1,6 +1,5 @@
 (setq luxbock-packages
-      '(
-        imenu-anywhere
+      '(imenu-anywhere
         clojure-mode-extra-font-locking
         visual-regexp-steroids
         dired-subtree
