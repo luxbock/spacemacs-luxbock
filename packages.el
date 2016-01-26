@@ -17,7 +17,7 @@
         scratch
         feature-mode
         evil-cleverparens
-        ;; (align-let :location local)
+        (align-let :location local)
         (dactyl-mode :location local)))
 
 (defun luxbock/init-imenu-anywhere ()
@@ -141,9 +141,10 @@
     :mode ("\\.feature$" . feature-mode)
     :diminish "fm"))
 
-;; (defun luxbock/init-align-let ()
-;;   (require 'align-let)
-;;   (spacemacs/set-leader-keys 'emacs-lisp-mode "ma" 'align-let))
+(defun luxbock/init-align-let ()
+  (use-package align-let
+    :init
+   (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "ma" 'align-let)))
 
 (defun luxbock/init-evil-cleverparens ()
   (use-package evil-cleverparens
