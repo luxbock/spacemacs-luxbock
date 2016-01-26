@@ -16,7 +16,9 @@
         typed-clojure-mode
         scratch
         feature-mode
-        evil-cleverparens))
+        evil-cleverparens
+        (align-let :location local)
+        (dactyl-mode :location local)))
 
 (defun luxbock/init-imenu-anywhere ()
   (use-package imenu-anywhere
