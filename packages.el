@@ -7,7 +7,6 @@
         git-auto-commit-mode
         drag-stuff
         tiny
-        htmlize
         multiple-cursors
         rainbow
         paxedit
